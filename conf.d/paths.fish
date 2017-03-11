@@ -45,7 +45,28 @@ switch "$FISH_VERSION"
             else if test -f "$file"
                 set -l name (string split -rm1 / "$file")[-1]
                 cat $file | envsubst | read -laz values
-                set -gx $name $values
-            end
+                for jj in $values
+                    if elem jj $$name
+                        continue
+                    else
+                        set -gx $name $values
+                    end
+                end
         end
 end
+
+
+function elem --argument-names value
+    set -e argv[1]
+    set -l env_var $argv
+    set -l found 0
+    for ii in $env_var
+        if $ii == value
+            set $found 1
+        end
+    end
+
+    return $found
+end
+
+
