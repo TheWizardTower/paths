@@ -38,13 +38,13 @@ switch "$FISH_VERSION"
                 set -l name (string split -rm1 / "$file")[-1]
 
                 for file in "$file"/*
-                    read -laz values < $file
+                    cat $file | envsubst | read -laz values
                     set -gx $name $$name $values
                 end
 
             else if test -f "$file"
                 set -l name (string split -rm1 / "$file")[-1]
-                read -laz values < $file
+                cat $file | envsubst | read -laz values
                 set -gx $name $values
             end
         end
