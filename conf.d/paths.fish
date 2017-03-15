@@ -1,3 +1,16 @@
+function elem --argument-names value seperator
+        set -e argv[1]
+        set -e argv[1]
+        set -l env_var $argv
+        for ii in (echo $env_var | tr $seperator '\n')
+                if test $ii = value
+                        return 1
+                end
+        end
+
+        return 0
+end
+
 if test -z "$paths_config"
     set -l config_home "$XDG_CONFIG_HOME"
 
@@ -37,36 +50,39 @@ switch "$FISH_VERSION"
             if test -d "$file"
                 set -l name (string split -rm1 / "$file")[-1]
 
+                set -l seperator " "
+                if test -f "$file/seperator.fish"
+                    read -laz seperator < "$file/seperator.fish"
+                end
+
                 for file in "$file"/*
+                    if test $file = "separator.fish"
+                        continue
+                    end
+
                     cat $file | envsubst | read -laz values
-                    set -gx $name $$name $values
+
+                    for value in $values
+                        if elem $value $$name
+                            continue
+                        end
+
+                        set -gx $name "$$name$separator$value"
+                    end
                 end
 
             else if test -f "$file"
                 set -l name (string split -rm1 / "$file")[-1]
                 cat $file | envsubst | read -laz values
                 for jj in $values
-                    if elem jj $$name
+                    if elem jj $seperator $$name
                         continue
                     else
                         set -gx $name $values
                     end
                 end
+            end
         end
-end
-
-
-function elem --argument-names value
-    set -e argv[1]
-    set -l env_var $argv
-    set -l found 0
-    for ii in $env_var
-        if $ii == value
-            set $found 1
-        end
-    end
-
-    return $found
 end
 
 
