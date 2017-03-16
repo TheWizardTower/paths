@@ -2,7 +2,7 @@ function elem --argument-names value seperator
         set -e argv[1]
         set -e argv[1]
         set -l env_var $argv
-        for ii in (echo $env_var | tr $seperator '\n')
+        for ii in (echo $env_var | tr "$seperator" '\n')
                 if test $ii = value
                         return 1
                 end
