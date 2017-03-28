@@ -1,14 +1,14 @@
-function elem --argument-names value seperator
-        set -e argv[1]
+function elem --argument-names value separator env_var
+        set -e argv[2]
         set -e argv[1]
         set -l env_var $argv
-        for ii in (echo $env_var | tr "$seperator" '\n')
-                if test $ii = value
-                        return 1
+        for ii in (echo $env_var | tr "$separator" '\n')
+                if test $ii = $value
+                        return 0
                 end
         end
 
-        return 0
+        return 1
 end
 
 if test -z "$paths_config"
@@ -47,27 +47,31 @@ switch "$FISH_VERSION"
 
     case \*
         for file in "$paths_config"/*
+            set -l separator " "
+            if test -f "$file/separator.fish"
+                read -laz separator < "$file/separator.fish"
+            end
+
             if test -d "$file"
                 set -l name (string split -rm1 / "$file")[-1]
 
-                set -l seperator " "
-                if test -f "$file/seperator.fish"
-                    read -laz seperator < "$file/seperator.fish"
-                end
-
                 for file in "$file"/*
-                    if test $file = "separator.fish"
+                    if echo $file | grep -q "separator.fish"
                         continue
                     end
 
                     cat $file | envsubst | read -laz values
 
                     for value in $values
-                        if elem $value $$name
+                        if elem "$value" "$separator" $$name
                             continue
                         end
 
-                        set -gx $name "$$name$separator$value"
+                        if test $separator = " "
+                            set -gx $name $$name $value
+                        else
+                            set -gx $name (printf "%s%s%s" $$name "$separator" $value)
+                        end
                     end
                 end
 
@@ -75,7 +79,7 @@ switch "$FISH_VERSION"
                 set -l name (string split -rm1 / "$file")[-1]
                 cat $file | envsubst | read -laz values
                 for jj in $values
-                    if elem jj $seperator $$name
+                    if elem "$jj" "$separator" $$name
                         continue
                     else
                         set -gx $name $values
