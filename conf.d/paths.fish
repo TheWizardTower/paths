@@ -71,8 +71,6 @@ switch "$FISH_VERSION"
                       set prefix 1
                     end
 
-                    echo $prefix
-
                     cat $file | envsubst | read -laz values
 
                     for value in $values
