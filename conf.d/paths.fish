@@ -60,6 +60,19 @@ switch "$FISH_VERSION"
                         continue
                     end
 
+                    set prefix 0
+
+                    # If the file starts with prefix (case insensitive), and has the
+                    # proper .fish closing extension, prefix the values in this file
+                    # to the appropriate variable, rather than the end.
+                    # In other words, prefix will put the value(s) to the beginning of the list,
+                    # whereas the default behavior is to append the value to the end of the list.
+                    if echo $file | grep -iq "prefix.*.fish"
+                      set prefix 1
+                    end
+
+                    echo $prefix
+
                     cat $file | envsubst | read -laz values
 
                     for value in $values
@@ -68,9 +81,17 @@ switch "$FISH_VERSION"
                         end
 
                         if test $separator = " "
+                          if test $prefix -eq 1
+                            set -gx $name $value $$name
+                          else
                             set -gx $name $$name $value
+                          end
                         else
+                          if test $prefix -eq 1
+                            set -gx $name (printf "%s%s%s" %value "$separator" $$name)
+                          else
                             set -gx $name (printf "%s%s%s" $$name "$separator" $value)
+                          end
                         end
                     end
                 end
