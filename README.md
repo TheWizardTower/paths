@@ -38,6 +38,8 @@ mkdir $paths_config/VAR
 echo VALUE > $paths_config/VAR/KEY.fish
 ```
 
+Where KEY is the name of the file that stores VAR's value and can be any name you wish.
+
 Prefix values to environment variables by having the file start with 'prefix'.
 
 ```fish
@@ -60,10 +62,11 @@ echo "$HOME/bin" > $paths_config/VAR/home_bin.fish
 echo $VAR
 ... /home/username/bin ...
 ```
-
-Where KEY is the name of the file that stores VAR's value and can be any name you wish.
-
 When you're done, restart any open terminal sessions for the change to take effect.
+
+The plugin also goes to some length to ensure that values already present in a
+variable are not added if it is already present -- so your $PATH (or similar
+things) won't become cluttered with repeated entries.
 
 ### Examples
 
