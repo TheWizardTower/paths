@@ -13,6 +13,16 @@ With [fisherman]
 fisher paths
 ```
 
+This package needs a fish version greater than 2.2.0.
+
+You also must install the envsubst binary. On fedora, this is in the gettext package.
+
+```fish
+dnf install envsubst
+```
+
+On other distros, ask your local package manager which package provides 'envsubst'.
+
 ## Usage
 
 Create or overwrite environment variables.
